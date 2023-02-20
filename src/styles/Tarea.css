@@ -1,0 +1,12 @@
+.lista-tareas{
+    background-color: rgb(71, 73, 73,.02);
+    border-radius: 25%;
+}
+btn{
+    background-color: rgb(80, 182, 182,.33);
+}
+
+.icono{
+ border-radius: 15px;
+ background-color:#383636;
+}
