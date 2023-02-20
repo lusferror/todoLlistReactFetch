@@ -13,6 +13,22 @@ const Formulario = ({setAddTarea,setTareas,addTarea,tareas}) => {
           done: false,
           id: tareas.length +1
         }
+        let option1={method:'POST',mode:'cors',body:JSON.stringify(tareaObj),header:{'Content-Type':'application/json'}}
+    const poneTareas = async ()=>{
+      try{
+        const response =  await fetch('https://assets.breatheco.de/apis/fake/todos/user/alesanchezr',option1);
+        const info2= await response.json();
+              setTareas(()=>info2);
+              setAddTarea("")
+              console.log("que tengo post?",info2)
+            //  setIsLoading(false);//  carga finalizada
+          }catch(error){
+            console.log(error);
+          }       
+        }
+        poneTareas()
+
+
         setTareas(tareas.concat(tareaObj))
         setAddTarea("")
     }
