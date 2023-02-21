@@ -1,40 +1,39 @@
 import '../styles/Formulario.css';
 import React from 'react';
+import { TiContacts } from 'react-icons/ti';
 
-const Formulario = ({setAddTarea,setTareas,addTarea,tareas}) => {
+const Formulario = ({setAddTarea,addTarea,newTarea}) => {
 
     const handleInputTarea=(e)=>{
+      //let tarea={label:e.tagret.value,done:false}
         setAddTarea((e.target.value))
       }
-      const newTarea=(e)=>{
-        e.preventDefault()
-        const tareaObj={
-          label: addTarea,
-          done: false,
-          id: tareas.length +1
-        }
-        let option1={method:'POST',mode:'cors',body:JSON.stringify(tareaObj),header:{'Content-Type':'application/json'}}
-    const poneTareas = async ()=>{
-      try{
-        const response =  await fetch('https://assets.breatheco.de/apis/fake/todos/user/alesanchezr',option1);
-        const info2= await response.json();
-              setTareas(()=>info2);
-              setAddTarea("")
-              console.log("que tengo post?",info2)
-            //  setIsLoading(false);//  carga finalizada
-          }catch(error){
-            console.log(error);
-          }       
-        }
-        poneTareas()
 
-
-        setTareas(tareas.concat(tareaObj))
-        setAddTarea("")
-    }
+   // const newTarea=(e)=>{
+   //    e.preventDefault()
+   //     const todo={
+   //       label: addTarea,
+   //       done: false,
+   //       //id: tareas.length + 1
+   //     }
+   //    // setTareas(tareas=>[...tareas,todo])
+   //    setTareas(tareas.concat(todo))
+//
+   //     fetch('https://assets.breatheco.de/apis/fake/todos/user/userx1',{
+   //          method:'PUT',
+   //          headers:{
+   //              'Content-Type':'application/json'
+   //          },
+   //          body:JSON.stringify(tareas)
+   //       })
+   //     .then(response=>response.json())
+   //     .then(data=>console.log(data))
+   //     .catch(e=>console.log(e))
+   //      setAddTarea("")
+   // }
   return (
-    <form onSubmit={newTarea}>
-            <input placeholder='Ingresar tarea' onChange={handleInputTarea} value={addTarea}/>
+    <form onSubmit={(e)=>newTarea(e)}>
+            <input placeholder='Ingresar tarea' onChange={(evento)=>handleInputTarea(evento)} value={addTarea}/>
             <button className='btn btn-secondary' type='submit'>add</button>
             
     </form>
