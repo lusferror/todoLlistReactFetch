@@ -23,7 +23,7 @@ const miPrimerPost=()=>{
 }
 
 useEffect(()=>{
-  for(let i= 0; i< 2; i++){
+  do{
   fetch('https://assets.breatheco.de/apis/fake/todos/user/userx1', {
     method: "GET",
     headers: {
@@ -41,7 +41,8 @@ useEffect(()=>{
         
       }else{
         setTareas(tareas.concat(data))
-         console.log("esto se recibio del servidor",data);
+        setVacio(true)
+       //  console.log("esto se recibio del servidor",data);
       }
       
   })
@@ -49,8 +50,10 @@ useEffect(()=>{
       //manejo de errores
       console.log(error);
   });
-  }
+  }while(vacio)
 },[])
+
+
 const PutFunction=(tareas)=>{
   fetch('https://assets.breatheco.de/apis/fake/todos/user/userx1',{
         method:'PUT',
@@ -94,7 +97,9 @@ const newTarea =(e)=>{
 
 
 useEffect(()=>{
-  PutFunction(tareas) 
+  if(vacio === true){
+    PutFunction(tareas) 
+  }
 },[tareas])
 
   return (
