@@ -1,3 +1,4 @@
+import { wait } from '@testing-library/user-event/dist/utils';
 import { useEffect, useState } from 'react';
 import './App.css';
 import Formulario from './components/Formulario';
@@ -6,54 +7,73 @@ import Tarea from './components/Tarea';
 function App() {
 const [tareas,setTareas]=useState([]);
 const [addTarea,setAddTarea]=useState();
-const [vacio, setVacio] = useState(false);
+const [vacio, setVacio] = useState(false); //No hizo falta usar el estado vacio,
+const [borrar, setBorrar] = useState(false); // agregue un nuevo estado, para que el useEffect que acualiza las tareas solo se ejecute cuando 
+                                            //se acutaliza las lista y no cuando se borre
 
-const miPrimerPost=()=>{
-  fetch('https://assets.breatheco.de/apis/fake/todos/user/userx1',{
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify([])
-  })
-  .then(response => response.json())
-  .then(data => console.log(data))
-  .catch(error=> console.log(error))
+/**
+ * Esta funcion es la que crea la lista de tareas desde desde cero
+ * @returns la respuesta en formato json 
+ */
+const miPrimerPost = async() =>{
+    const response = await fetch('https://assets.breatheco.de/apis/fake/todos/user/userx1',{
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify([])
+        })
 
+    return response.json();
 }
 
-useEffect(()=>{
-  do{
-  fetch('https://assets.breatheco.de/apis/fake/todos/user/userx1', {
+/**
+ * Esta función, es el get de la api, que te trae todas las tareas cuando cargas la pagina.
+ * @returns la respuesta en formato json 
+ */
+const getFuncion = async ()=>{
+  const response =  await fetch('https://assets.breatheco.de/apis/fake/todos/user/userx1', {
     method: "GET",
     headers: {
       "Content-Type": "application/json"
     }
-  })
-  .then(resp => {
-      return resp.json(); 
-      
-    })
-  .then(data => {
-    const valor='This use does not exists, first call the POST method first to create the list for this username'
-      if(data.msg === valor){
-        miPrimerPost()
-        
-      }else{
-        setTareas(tareas.concat(data))
-        setVacio(true)
-       //  console.log("esto se recibio del servidor",data);
-      }
-      
-  })
-  .catch(error => {
-      //manejo de errores
-      console.log(error);
-  });
-  }while(vacio)
+  }); 
+  const respuesta =  response.json()
+  return respuesta;
+}
+
+/**
+ * Esta funcion junta todas las asincronias, no funcionaba el bucle "while" o "for", por que estabamos trabajando con funciones asíncronas, lo que quiere decir
+ * que no esperaba la consulta a la api, y no tenia la respuesta a tiempo, entonces de esta manera obligo a la aplicaición esperar la respuesta de cada fetch para
+ * que pueda continuar a la siguiente función
+ */
+const onLoad = async() =>{
+  const valor='This use does not exists, first call the POST method first to create the list for this username'
+  const get = await getFuncion();
+  if (get.msg == valor){
+      await miPrimerPost();
+      const get = await getFuncion();
+      setTareas(get);
+  }
+  else{
+    setTareas(get);
+  }
+
+}
+
+/**
+ * Aquí llamamos la función que junta las asincronias, para que se ejecute en el useEffect
+ */
+useEffect( () =>{
+
+  onLoad();
+  
 },[])
 
-
+/**
+ * Esta funcion actualiza la lista de tareas en la api
+ * @param {*} tareas corresponde a la lista de tareas 
+ */
 const PutFunction=(tareas)=>{
   fetch('https://assets.breatheco.de/apis/fake/todos/user/userx1',{
         method:'PUT',
@@ -67,7 +87,8 @@ const PutFunction=(tareas)=>{
    .catch(e=>console.log(e))
 }
 const DeletFunction=()=>{
-  console.log("funcion delete")
+  setTareas([]);
+  setBorrar(true)
   fetch('https://assets.breatheco.de/apis/fake/todos/user/userx1',{
         method:'DELETE',
         headers:{
@@ -78,27 +99,32 @@ const DeletFunction=()=>{
    .then(response=>response.json())
    .then(data=>console.log(data))
    .catch(e=>console.log(e))
-   setTareas([])
 }
 
+/**
+ * Esta funcion agrega una nueva tarea a nuestro esta "tareas"
+ * @param {*} e es el evento 
+ */
 const newTarea =(e)=>{
   e.preventDefault()
+  setBorrar(false);
    const todo={
      label: addTarea,
      done: false,
-     //id: tareas.length + 1
    }
-  // setTareas(tareas=>[...tareas,todo])
   setTareas(tareas.concat(todo))
 
     
     setAddTarea("")
 }
 
-
+/**
+ * Esta funcion detecta el cambio de nuestro estado "tareas", pero solo se va a ejecutar cuando la lista sea mayor a 0 y 
+ * no estemos ejectuando la funcion "DeletFunction"
+ */
 useEffect(()=>{
-  if(vacio === true){
-    PutFunction(tareas) 
+  if(tareas.length > 0 && borrar ==  false){
+    PutFunction(tareas) ;
   }
 },[tareas])
 

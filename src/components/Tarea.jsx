@@ -4,6 +4,10 @@ import React from 'react';
 
 const Tarea = ({tareas,setTareas}) => {
 
+    /**
+     * Esta funcion borra solo 1 tarea
+     * @param {*} id es el indice de la posicion en el array, de la tarea
+     */
     const deletTarea=(id)=>{
       
         let result= tareas.filter((tarea,ind2) => ind2 !== id)
